@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  player1:
+    build: .
+    ports:
+      - "8080:8080"
+  player2:
+    build: .
+    ports:
+      - "8081:8080"
