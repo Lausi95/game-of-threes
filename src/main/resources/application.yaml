@@ -1,0 +1,27 @@
+spring:
+    kafka:
+        consumer:
+            bootstrap-servers: ${KAFKA_URL}
+            group-id: ${PLAYER_ID}
+            auto-offset-reset: latest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+            properties:
+                spring:
+                    json:
+                        trusted:
+                            packages: "de.lausi95.gameofthrees.*"
+                    deserializer:
+                        value:
+                            delegate:
+                                class: org.springframework.kafka.support.serializer.JsonDeserializer
+        producer:
+            bootstrap-servers: ${KAFKA_URL}
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+game-of-three:
+    player-id: ${PLAYER_ID}
+
+topics:
+    game-started: "game-started"
