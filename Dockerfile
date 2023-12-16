@@ -1,7 +1,9 @@
-FROM openjdk:17-alpine as builder
+FROM gradle:8.5-jdk17 as builder
+
+WORKDIR /
 
 COPY . .
-RUN ./gradlew build -x test
+RUN gradle build -x test
 
 FROM openjdk:17-alpine
 
