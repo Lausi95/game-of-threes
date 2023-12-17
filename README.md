@@ -9,3 +9,6 @@
   by 3.
   I suggest this is a typo on the assignment and should state [-1, 0, 1].
   I assume this to be the case for this implementation.
+
+## TODO
+- Add possibility to play the game manually
