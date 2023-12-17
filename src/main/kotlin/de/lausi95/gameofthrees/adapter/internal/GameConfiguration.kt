@@ -1,7 +1,7 @@
 package de.lausi95.gameofthrees.adapter.internal
 
-import de.lausi95.gameofthrees.domain.game.RandomStartValueStrategy
-import de.lausi95.gameofthrees.domain.game.StartValueStrategy
+import de.lausi95.gameofthrees.domain.game.RandomStartNumberGenerator
+import de.lausi95.gameofthrees.domain.game.StartNumberGenerator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -9,5 +9,5 @@ import org.springframework.context.annotation.Configuration
 private class GameConfiguration {
 
   @Bean
-  fun startValueStrategy(): StartValueStrategy = RandomStartValueStrategy()
+  fun startValueStrategy(): StartNumberGenerator = RandomStartNumberGenerator()
 }

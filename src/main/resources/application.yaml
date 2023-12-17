@@ -25,3 +25,4 @@ game-of-three:
 
 topics:
     game-started: "game-started"
+    turn-played: "turn-played"
