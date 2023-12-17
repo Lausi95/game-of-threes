@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component
 @Component
 private class PlayerRepositoryImpl(@Value("\${game-of-three.player-id}") private val playerId: String) : PlayerRepository {
 
-  private val player = Player(playerId)
+  private val me = Player(playerId)
 
   override fun getMe(): Player {
-    return player
+    return me
   }
 }
