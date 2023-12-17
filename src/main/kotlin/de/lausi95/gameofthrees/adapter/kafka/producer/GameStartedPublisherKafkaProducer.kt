@@ -1,6 +1,7 @@
 package de.lausi95.gameofthrees.adapter.kafka.producer
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import de.lausi95.gameofthrees.adapter.kafka.dto.GameDto
 import de.lausi95.gameofthrees.domain.game.Game
 import de.lausi95.gameofthrees.domain.game.GameStartedPublisher
 import org.springframework.beans.factory.annotation.Value
@@ -15,7 +16,8 @@ private class GameStartedPublisherKafkaProducer(
 ): GameStartedPublisher {
 
   override fun publishGameStarted(game: Game) {
-    val message = objectMapper.writeValueAsString(game)
+    val gameDto = GameDto(game.startNumber, game.initiatorPlayerId)
+    val message = objectMapper.writeValueAsString(gameDto)
     kafkaTemplate.send(gameStartedTopic, message)
   }
 }

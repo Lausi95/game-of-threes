@@ -1,6 +1,7 @@
 package de.lausi95.gameofthrees.adapter.kafka.listener
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import de.lausi95.gameofthrees.adapter.kafka.dto.GameDto
 import de.lausi95.gameofthrees.application.TurnApplicationService
 import de.lausi95.gameofthrees.domain.game.Game
 import org.springframework.kafka.annotation.KafkaListener
@@ -14,7 +15,8 @@ private class GameListener(
 
   @KafkaListener(topics = ["\${topics.game-started}"])
   fun startGameListener(message: String) {
-    val game = objectMapper.readValue(message, Game::class.java)
+    val gameDto = objectMapper.readValue(message, GameDto::class.java)
+    val game = Game(gameDto.startNumber, gameDto.initiatorPlayerId)
     turnApplicationService.playFirstTurn(game)
   }
 }
