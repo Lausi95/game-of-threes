@@ -1,5 +1,7 @@
 # Game of threes
 
+[![tests](https://github.com/Lausi95/game-of-threes/actions/workflows/test.yml/badge.svg)](https://github.com/Lausi95/game-of-threes/actions/workflows/test.yml)
+
 ## Important Notes
 - In the introduction text of the assignment, it is stated that the possible
   moves of a player are [1, 0, 1]. This leads to impossible game states, since
