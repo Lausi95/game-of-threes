@@ -11,10 +11,12 @@ by 3.
 I think there is a typo on the definition and it should state [-1, 0, 1].
 I assume this to be the case for this implementation.
 
-## Technologies
-- Language: Kotlin
-- Framework: Spring-Boot
-- Communication: Kafka
+## Technologies & Paradigms
+- Kotlin
+- Spring-Boot
+- Kafka
+- Domain-Driven Design
+- Onion Architecture
 
 ## Build and Run
 To build and run the app(s) just go for docker-compose:
