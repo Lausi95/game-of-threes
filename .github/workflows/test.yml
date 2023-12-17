@@ -1,11 +1,11 @@
 name: tests
-on:
-  push:
+run-name: ${{ github.actor }} has triggered tests
+on: [push]
 
 jobs:
   unit-tests:
     name: Run unit tests
-    runs-on: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
