@@ -1,6 +1,6 @@
 package de.lausi95.gameofthrees
 
-import de.lausi95.gameofthrees.domain.player.Player
+import de.lausi95.gameofthrees.domain.model.player.Player
 import java.time.Instant
 import kotlin.random.Random
 

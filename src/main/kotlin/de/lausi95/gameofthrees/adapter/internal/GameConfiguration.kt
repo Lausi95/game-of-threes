@@ -1,10 +1,10 @@
 package de.lausi95.gameofthrees.adapter.internal
 
-import de.lausi95.gameofthrees.domain.game.RandomStartNumberGenerator
-import de.lausi95.gameofthrees.domain.game.StartNumberGenerator
-import de.lausi95.gameofthrees.domain.turn.AUTOMATIC_MOVE_RESOLVER
-import de.lausi95.gameofthrees.domain.turn.MANUAL_MOVE_RESOLVER
-import de.lausi95.gameofthrees.domain.turn.MoveResolver
+import de.lausi95.gameofthrees.domain.model.game.RandomStartNumberGenerator
+import de.lausi95.gameofthrees.domain.model.game.StartNumberGenerator
+import de.lausi95.gameofthrees.domain.model.turn.AUTOMATIC_MOVE_RESOLVER
+import de.lausi95.gameofthrees.domain.model.turn.MANUAL_MOVE_RESOLVER
+import de.lausi95.gameofthrees.domain.model.turn.MoveResolver
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean

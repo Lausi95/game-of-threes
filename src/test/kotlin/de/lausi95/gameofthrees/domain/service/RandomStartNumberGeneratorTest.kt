@@ -1,5 +1,6 @@
-package de.lausi95.gameofthrees.domain.game
+package de.lausi95.gameofthrees.domain.service
 
+import de.lausi95.gameofthrees.domain.model.game.RandomStartNumberGenerator
 import de.lausi95.gameofthrees.someInt
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.RepeatedTest

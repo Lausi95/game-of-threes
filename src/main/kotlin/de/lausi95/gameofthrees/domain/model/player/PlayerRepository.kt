@@ -1,9 +1,4 @@
-package de.lausi95.gameofthrees.domain.player
-
-/**
- * Represents a player in the game.
- */
-data class Player(val playerId: String)
+package de.lausi95.gameofthrees.domain.model.player
 
 /**
  * Represents a repository for managing player data.

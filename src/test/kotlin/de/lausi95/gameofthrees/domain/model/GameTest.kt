@@ -1,5 +1,8 @@
-package de.lausi95.gameofthrees.domain.game
+package de.lausi95.gameofthrees.domain.model
 
+import de.lausi95.gameofthrees.domain.model.game.Game
+import de.lausi95.gameofthrees.domain.model.game.GameStartedPublisher
+import de.lausi95.gameofthrees.domain.model.game.StartNumberGenerator
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
 import org.junit.jupiter.api.Assertions.*
@@ -19,11 +22,16 @@ class GameTest {
     }
 
     var publishGameFunctionTriggered = false
-    Game.start(somePlayer, startNumberGenerator) {
-      publishGameFunctionTriggered = true
-      assertEquals(someStartNumber, it.startNumber)
-      assertEquals(somePlayer.playerId, it.initiatorPlayerId)
+
+    val gameStartedPublisher = object : GameStartedPublisher {
+      override fun publishGameStarted(game: Game) {
+        publishGameFunctionTriggered = true
+        assertEquals(someStartNumber, game.startNumber)
+        assertEquals(somePlayer.playerId, game.initiatorPlayerId)
+      }
     }
+
+    Game.start(somePlayer, startNumberGenerator, gameStartedPublisher)
     assertTrue(publishGameFunctionTriggered)
   }
 
@@ -39,9 +47,12 @@ class GameTest {
     }
 
     var publishGameFunctionTriggered = false
-    Game.start(somePlayer, startNumberGenerator) {
-      publishGameFunctionTriggered = true
+    val gameStartedPublisher = object : GameStartedPublisher {
+      override fun publishGameStarted(game: Game) {
+        publishGameFunctionTriggered = true
+      }
     }
+    Game.start(somePlayer, startNumberGenerator, gameStartedPublisher)
     assertFalse(publishGameFunctionTriggered)
   }
 }

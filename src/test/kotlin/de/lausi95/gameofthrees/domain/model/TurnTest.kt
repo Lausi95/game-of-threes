@@ -1,8 +1,10 @@
-package de.lausi95.gameofthrees.domain
+package de.lausi95.gameofthrees.domain.model
 
-import de.lausi95.gameofthrees.domain.game.Game
-import de.lausi95.gameofthrees.domain.player.Player
-import de.lausi95.gameofthrees.domain.turn.Turn
+import de.lausi95.gameofthrees.domain.model.game.Game
+import de.lausi95.gameofthrees.domain.model.player.Player
+import de.lausi95.gameofthrees.domain.model.turn.Turn
+import de.lausi95.gameofthrees.domain.model.turn.AUTOMATIC_MOVE_RESOLVER
+import de.lausi95.gameofthrees.domain.model.turn.TurnPlayedPublisher
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
 import de.lausi95.gameofthrees.someString
@@ -20,10 +22,13 @@ class TurnTest {
 
     val turn = Turn(somePlayerId, someOpponentId, 18, 0, 6)
     var called = false
-    turn.playNextTurn(me) {
-      assertEquals(Turn(someOpponentId, somePlayerId, 6, 0, 2), it)
-      called = true
+    val turnPlayedPublisher = object : TurnPlayedPublisher {
+      override fun publishTurnPlayed(turn: Turn) {
+        assertEquals(Turn(someOpponentId, somePlayerId, 6, 0, 2), turn)
+        called = true
+      }
     }
+    turn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
     assertTrue(called)
   }
 
@@ -38,9 +43,12 @@ class TurnTest {
     val someMoveThatWinsNextTurn = Turn(somePlayerId, someOpponentId, 3 * (3 - move) - move, move, 3 - move)
 
     var onNextTurnTriggered = false
-    someMoveThatWinsNextTurn.playNextTurn(me) {
-      onNextTurnTriggered = true
+    val turnPlayedPublisher = object : TurnPlayedPublisher {
+      override fun publishTurnPlayed(turn: Turn) {
+        onNextTurnTriggered = true
+      }
     }
+    someMoveThatWinsNextTurn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
     assertFalse(onNextTurnTriggered)
   }
 
@@ -102,10 +110,13 @@ class TurnTest {
     val someGame = Game(someStartNumber, someString())
 
     var onValidTurnTriggered = false
-    Turn.playFirstTurn(somePlayer, someGame) {
-      onValidTurnTriggered = true
-      assertEquals(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3), it)
+    val turnPlayedPublisher = object : TurnPlayedPublisher {
+      override fun publishTurnPlayed(turn: Turn) {
+        onValidTurnTriggered = true
+        assertEquals(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3), turn)
+      }
     }
+    Turn.playFirstTurn(somePlayer, someGame, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
     assertTrue(onValidTurnTriggered)
   }
 }

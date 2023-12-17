@@ -2,8 +2,8 @@ package de.lausi95.gameofthrees.adapter.kafka.producer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.lausi95.gameofthrees.adapter.kafka.dto.TurnDto
-import de.lausi95.gameofthrees.domain.turn.TurnPlayedPublisher
-import de.lausi95.gameofthrees.domain.turn.Turn
+import de.lausi95.gameofthrees.domain.model.turn.TurnPlayedPublisher
+import de.lausi95.gameofthrees.domain.model.turn.Turn
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component

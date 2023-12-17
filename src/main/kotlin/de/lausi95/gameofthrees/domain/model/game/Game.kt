@@ -1,9 +1,7 @@
-package de.lausi95.gameofthrees.domain.game
+package de.lausi95.gameofthrees.domain.model.game
 
-import de.lausi95.gameofthrees.domain.player.Player
+import de.lausi95.gameofthrees.domain.model.player.Player
 import org.slf4j.LoggerFactory
-
-typealias PublishGameFunction = (Game) -> Unit
 
 /**
  * Represents a game.
@@ -25,15 +23,15 @@ data class Game(
      * @param publishGameFunction The function for publishing the game.
      * @return The initialized game instance if the game is properly setup, otherwise `null`.
      */
-    fun start(player: Player, startNumberGenerator: StartNumberGenerator, publishGameFunction: PublishGameFunction): Game? {
+    fun start(player: Player, startNumberGenerator: StartNumberGenerator, gameStartedPublisher: GameStartedPublisher): Game? {
       val startValue = startNumberGenerator.generateStartValue()
       if (startValue <= 1) {
         log.warn("Won't start game with start value $startValue. It has to be > 1 to create a valid game setup.")
         return null
       }
 
-      val game = Game(startNumberGenerator.generateStartValue(), player.playerId)
-      publishGameFunction(game)
+      val game = Game(startValue, player.playerId)
+      gameStartedPublisher.publishGameStarted(game)
       return game
     }
   }

@@ -1,11 +1,11 @@
-package de.lausi95.gameofthrees.domain.turn
+package de.lausi95.gameofthrees.domain.model.turn
 
 val AUTOMATIC_MOVE_RESOLVER = object : MoveResolver {
-  override fun decideMove(number: Int): Int = number.resolveNextMove()
+  override fun resolveMove(number: Int): Int = number.resolveNextMove()
 }
 
 val MANUAL_MOVE_RESOLVER = object : MoveResolver {
-  override fun decideMove(number: Int): Int {
+  override fun resolveMove(number: Int): Int {
     while (true) {
       try {
         print("Your move for $number >> ")
@@ -24,5 +24,5 @@ val MANUAL_MOVE_RESOLVER = object : MoveResolver {
 
 interface MoveResolver {
 
-  fun decideMove(number: Int): Int
+  fun resolveMove(number: Int): Int
 }

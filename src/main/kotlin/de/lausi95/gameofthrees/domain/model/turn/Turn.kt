@@ -1,7 +1,7 @@
-package de.lausi95.gameofthrees.domain.turn
+package de.lausi95.gameofthrees.domain.model.turn
 
-import de.lausi95.gameofthrees.domain.game.Game
-import de.lausi95.gameofthrees.domain.player.Player
+import de.lausi95.gameofthrees.domain.model.game.Game
+import de.lausi95.gameofthrees.domain.model.player.Player
 import org.slf4j.LoggerFactory
 
 fun Int.isValid(): Boolean = VALID_MOVES.contains(this)
@@ -12,8 +12,6 @@ fun Int.distanceToNextNumberDivisibleBy(): Int = (this / DIVISOR + 1) * DIVISOR 
 fun Int.resolveResponseNumber(move: Int): Int = (this + move) / DIVISOR
 
 fun Int.resolveStartingNumber(move: Int): Int = this * DIVISOR - move
-
-typealias PublishTurnFunction = (Turn) -> Unit
 
 internal fun Int.resolveNextMove(): Int {
   return listOf(
@@ -54,16 +52,18 @@ data class Turn(
      * @param game The game being played.
      * @param onValidTurn A function that will be called with the valid turn as a parameter.
      */
-    fun playFirstTurn(player: Player, game: Game, moveResolver: MoveResolver = AUTOMATIC_MOVE_RESOLVER, onValidTurn: PublishTurnFunction) {
+    fun playFirstTurn(player: Player, game: Game, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
       if (player.playerId == game.initiatorPlayerId) {
         return
       }
 
       log.info("I (${player.playerId}) Playing the Game against ${game.initiatorPlayerId} with starting number: ${game.startNumber}")
 
-      val firstMove = moveResolver.decideMove(game.startNumber)
+      val firstMove = moveResolver.resolveMove(game.startNumber)
       val responseNumber = game.startNumber.resolveResponseNumber(firstMove)
-      onValidTurn(Turn(player.playerId, game.initiatorPlayerId, game.startNumber, firstMove, responseNumber))
+
+      val turn = Turn(player.playerId, game.initiatorPlayerId, game.startNumber, firstMove, responseNumber)
+      turnPlayedPublisher.publishTurnPlayed(turn)
     }
   }
 
@@ -79,7 +79,7 @@ data class Turn(
    *
    * @param onNextTurn a function that will be called with the next turn as a parameter
    */
-  fun playNextTurn(me: Player, moveResolver: MoveResolver = AUTOMATIC_MOVE_RESOLVER, onNextTurn: PublishTurnFunction) {
+  fun playNextTurn(me: Player, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
     if (opponentPlayerId == playerId) {
       return
     }
@@ -87,7 +87,7 @@ data class Turn(
       return
     }
 
-    val move = moveResolver.decideMove(responseNumber)
+    val move = moveResolver.resolveMove(responseNumber)
 
     val nextTurn = Turn(
       opponentPlayerId,
@@ -104,7 +104,7 @@ data class Turn(
 
     log.info("I ($playerId) playing the move $move against the player $opponentPlayerId on number $startingNumber. Number for opponent: $responseNumber")
 
-    onNextTurn(nextTurn)
+    turnPlayedPublisher.publishTurnPlayed(nextTurn)
   }
 
   /**

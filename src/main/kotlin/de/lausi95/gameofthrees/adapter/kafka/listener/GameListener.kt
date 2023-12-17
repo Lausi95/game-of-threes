@@ -3,7 +3,7 @@ package de.lausi95.gameofthrees.adapter.kafka.listener
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.lausi95.gameofthrees.adapter.kafka.dto.GameDto
 import de.lausi95.gameofthrees.application.TurnApplicationService
-import de.lausi95.gameofthrees.domain.game.Game
+import de.lausi95.gameofthrees.domain.model.game.Game
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 

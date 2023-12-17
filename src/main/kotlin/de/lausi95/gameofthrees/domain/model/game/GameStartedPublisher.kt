@@ -1,4 +1,6 @@
-package de.lausi95.gameofthrees.domain.game
+package de.lausi95.gameofthrees.domain.model.game
+
+import de.lausi95.gameofthrees.domain.model.game.Game
 
 /**
  * Represents an interface for publishing the start of a game.

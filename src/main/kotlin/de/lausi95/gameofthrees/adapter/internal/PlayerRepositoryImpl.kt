@@ -1,7 +1,7 @@
 package de.lausi95.gameofthrees.adapter.internal
 
-import de.lausi95.gameofthrees.domain.player.Player
-import de.lausi95.gameofthrees.domain.player.PlayerRepository
+import de.lausi95.gameofthrees.domain.model.player.Player
+import de.lausi95.gameofthrees.domain.model.player.PlayerRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
