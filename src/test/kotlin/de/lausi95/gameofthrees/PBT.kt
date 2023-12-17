@@ -6,7 +6,7 @@ import kotlin.random.Random
 
 class PbtRandom(seed: Int, private val random: Random) {
   init {
-    println("SEED: $seed")
+    println("PBT_SEED: $seed")
   }
 
   constructor(seed: Int) : this(seed, Random(seed))
