@@ -48,6 +48,8 @@ The game will go on until on player can reduce the number to 1.
 
 ## Configuration
 
+The configuration of a player is done by environment variables.
+
 `KAFKA_URL`: **mandatory** Url to a kafka node.
 
 `PLAYER_ID`: **mandatory** ID of the player, playing the game. If multiple players should
