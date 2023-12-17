@@ -4,6 +4,7 @@ import de.lausi95.gameofthrees.domain.game.Game
 import de.lausi95.gameofthrees.domain.player.Player
 import de.lausi95.gameofthrees.domain.turn.Turn
 import de.lausi95.gameofthrees.someInt
+import de.lausi95.gameofthrees.somePlayer
 import de.lausi95.gameofthrees.someString
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
@@ -13,12 +14,13 @@ class TurnTest {
 
   @Test
   fun nextTurn_returnValidNextTurn() {
+    val me = somePlayer()
     val somePlayerId = someString()
     val someOpponentId = someString()
 
     val turn = Turn(somePlayerId, someOpponentId, 18, 0, 6)
     var called = false
-    turn.playNextTurn {
+    turn.playNextTurn(me) {
       assertEquals(Turn(someOpponentId, somePlayerId, 6, 0, 2), it)
       called = true
     }
@@ -27,6 +29,7 @@ class TurnTest {
 
   @RepeatedTest(10)
   fun isWinningMove_true_onWinningResponseValue() {
+    val me = somePlayer()
     val somePlayerId = someString()
     val someOpponentId = someString()
 
@@ -35,7 +38,7 @@ class TurnTest {
     val someMoveThatWinsNextTurn = Turn(somePlayerId, someOpponentId, 3 * (3 - move) - move, move, 3 - move)
 
     var onNextTurnTriggered = false
-    someMoveThatWinsNextTurn.playNextTurn {
+    someMoveThatWinsNextTurn.playNextTurn(me) {
       onNextTurnTriggered = true
     }
     assertFalse(onNextTurnTriggered)

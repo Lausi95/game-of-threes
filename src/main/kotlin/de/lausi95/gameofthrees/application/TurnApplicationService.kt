@@ -2,7 +2,6 @@ package de.lausi95.gameofthrees.application
 
 import de.lausi95.gameofthrees.domain.game.Game
 import de.lausi95.gameofthrees.domain.player.PlayerRepository
-import de.lausi95.gameofthrees.domain.turn.AUTOMATIC_MOVE_RESOLVER
 import de.lausi95.gameofthrees.domain.turn.MoveResolver
 import de.lausi95.gameofthrees.domain.turn.TurnPlayedPublisher
 import de.lausi95.gameofthrees.domain.turn.Turn
