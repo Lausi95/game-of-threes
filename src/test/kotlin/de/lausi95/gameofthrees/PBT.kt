@@ -4,6 +4,8 @@ import de.lausi95.gameofthrees.domain.player.Player
 import java.time.Instant
 import kotlin.random.Random
 
+private val CHAR_POOL =  ('a'..'z') + ('A'..'Z') + ('0'..'9')
+
 class PbtRandom(seed: Int, private val random: Random) {
   init {
     println("PBT_SEED: $seed")
@@ -13,7 +15,7 @@ class PbtRandom(seed: Int, private val random: Random) {
 
   fun nextInt(from: Int = 0, to: Int = 100) = random.nextInt(from, to)
 
-  fun nextString(length: Int) = String(random.nextBytes("abcdefghijklmnopqrstuvwxyz".encodeToByteArray(), length))
+  fun nextString(length: Int) = (1..length).map { nextInt(0, CHAR_POOL.size).let { CHAR_POOL[it] }}.joinToString("")
 }
 
 val random = PbtRandom(System.getenv("PBT_SEED")?.toInt() ?: Instant.now().nano)
