@@ -6,20 +6,19 @@ import org.slf4j.LoggerFactory
 
 fun Int.isValid(): Boolean = VALID_MOVES.contains(this)
 
-fun Int.distanceToPrevNumberDivisibleBy(divisor: Int): Int = (this / divisor) * divisor - this
-fun Int.distanceToNextNumberDivisibleBy(divisor: Int): Int = (this / divisor + 1) * divisor - this
+fun Int.distanceToPrevNumberDivisibleBy(): Int = (this / DIVISOR) * DIVISOR - this
+fun Int.distanceToNextNumberDivisibleBy(): Int = (this / DIVISOR + 1) * DIVISOR - this
 
-fun Int.resolveResponseNumber(divisor: Int, move: Int): Int = (this + move) / divisor
-fun Int.resolveResponseNumber(divisor: Int): Int = this.resolveResponseNumber(divisor, this.resolveNextMove(divisor))
+fun Int.resolveResponseNumber(move: Int): Int = (this + move) / DIVISOR
 
-fun Int.resolveStartingNumber(divisor: Int, move: Int): Int = this * divisor - move
+fun Int.resolveStartingNumber(move: Int): Int = this * DIVISOR - move
 
 typealias PublishTurnFunction = (Turn) -> Unit
 
-private fun Int.resolveNextMove(divisor: Int): Int {
+internal fun Int.resolveNextMove(): Int {
   return listOf(
-    this.distanceToNextNumberDivisibleBy(divisor),
-    this.distanceToPrevNumberDivisibleBy(divisor)
+    this.distanceToNextNumberDivisibleBy(),
+    this.distanceToPrevNumberDivisibleBy()
   ).filter { VALID_MOVES.contains(it) }.min()
 }
 
@@ -55,51 +54,47 @@ data class Turn(
      * @param game The game being played.
      * @param onValidTurn A function that will be called with the valid turn as a parameter.
      */
-    fun playFirstTurn(player: Player, game: Game, onValidTurn: PublishTurnFunction) {
+    fun playFirstTurn(player: Player, game: Game, moveResolver: MoveResolver = AUTOMATIC_MOVE_RESOLVER, onValidTurn: PublishTurnFunction) {
       if (player.playerId == game.initiatorPlayerId) {
         return
       }
 
       log.info("I (${player.playerId}) Playing the Game against ${game.initiatorPlayerId} with starting number: ${game.startNumber}")
-      onValidTurn(Turn(player.playerId, game.initiatorPlayerId, game.startNumber))
+
+      val firstMove = moveResolver.decideMove(game.startNumber)
+      val responseNumber = game.startNumber.resolveResponseNumber(firstMove)
+      onValidTurn(Turn(player.playerId, game.initiatorPlayerId, game.startNumber, firstMove, responseNumber))
     }
   }
 
   init {
     if (!move.isValid())
       throw IllegalArgumentException("Invalid move. Valid Moves: $VALID_MOVES")
-    if (responseNumber.resolveStartingNumber(DIVISOR, move) != startingNumber)
+    if (responseNumber.resolveStartingNumber(move) != startingNumber)
       throw IllegalArgumentException("Impossible move")
   }
-
-  constructor(
-    playerId: String,
-    opponentPlayerId: String,
-    startingNumber: Int
-  ) : this(
-    playerId,
-    opponentPlayerId,
-    startingNumber,
-    startingNumber.resolveNextMove(DIVISOR),
-    startingNumber.resolveResponseNumber(DIVISOR)
-  )
 
   /**
    * Plays the next turn in the game.
    *
    * @param onNextTurn a function that will be called with the next turn as a parameter
    */
-  fun playNextTurn(onNextTurn: PublishTurnFunction) {
+  fun playNextTurn(me: Player, moveResolver: MoveResolver = AUTOMATIC_MOVE_RESOLVER, onNextTurn: PublishTurnFunction) {
     if (opponentPlayerId == playerId) {
       return
     }
+    if (opponentPlayerId == me.playerId) {
+      return
+    }
+
+    val move = moveResolver.decideMove(responseNumber)
 
     val nextTurn = Turn(
       opponentPlayerId,
       playerId,
       responseNumber,
-      responseNumber.resolveNextMove(DIVISOR),
-      responseNumber.resolveResponseNumber(DIVISOR)
+      move,
+      responseNumber.resolveResponseNumber(move)
     )
 
     if (nextTurn.isWinningTurn()) {

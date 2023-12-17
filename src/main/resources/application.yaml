@@ -22,6 +22,7 @@ spring:
 
 game-of-three:
     player-id: ${PLAYER_ID}
+    move-resolver: ${MOVE_RESOLVER}
 
 topics:
     game-started: "game-started"
