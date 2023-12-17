@@ -78,7 +78,9 @@ data class Turn(
   /**
    * Plays the next turn in the game.
    *
-   * @param onNextTurn a function that will be called with the next turn as a parameter
+   * @param me The current player.
+   * @param moveResolver The move resolver for resolving the player's move.
+   * @param turnPlayedPublisher The publisher for publishing the turn.
    */
   fun playNextTurn(me: Player, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
     if (opponentPlayerId == playerId) {
