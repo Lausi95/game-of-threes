@@ -46,11 +46,12 @@ data class Turn(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     /**
-     * Plays the first turn of the game.
+     * Plays the first turn of a game.
      *
-     * @param player The player playing the turn.
-     * @param game The game being played.
-     * @param onValidTurn A function that will be called with the valid turn as a parameter.
+     * @param player The player who is playing the turn.
+     * @param game The game in which the turn is being played.
+     * @param moveResolver The move resolver for resolving the player's move.
+     * @param turnPlayedPublisher The publisher for publishing the turn.
      */
     fun playFirstTurn(player: Player, game: Game, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
       if (player.playerId == game.initiatorPlayerId) {

@@ -20,7 +20,7 @@ data class Game(
      *
      * @param player The player who initiates the game.
      * @param startNumberGenerator The strategy for generating the start value of the game.
-     * @param publishGameFunction The function for publishing the game.
+     * @param gameStartedPublisher The function for publishing the game.
      * @return The initialized game instance if the game is properly setup, otherwise `null`.
      */
     fun start(player: Player, startNumberGenerator: StartNumberGenerator, gameStartedPublisher: GameStartedPublisher): Game? {
