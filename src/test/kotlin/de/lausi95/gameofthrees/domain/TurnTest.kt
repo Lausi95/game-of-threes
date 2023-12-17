@@ -1,5 +1,7 @@
 package de.lausi95.gameofthrees.domain
 
+import de.lausi95.gameofthrees.domain.game.Game
+import de.lausi95.gameofthrees.domain.player.Player
 import de.lausi95.gameofthrees.domain.turn.Turn
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.someString
@@ -10,7 +12,7 @@ import org.junit.jupiter.api.Test
 class TurnTest {
 
   @Test
-  fun nextTurn_returnValidNextTurn1() {
+  fun nextTurn_returnValidNextTurn() {
     val somePlayerId = someString()
     val someOpponentId = someString()
 
@@ -23,28 +25,20 @@ class TurnTest {
     assertTrue(called)
   }
 
-  @Test
-  fun nextTurn_returnValidNextTurn2() {
-    val somePlayerId = someString()
-    val someOpponentId = someString()
-
-    val turn = Turn(somePlayerId, someOpponentId, 19, -1, 6)
-    var called = false
-    turn.playNextTurn {
-      assertEquals(Turn(someOpponentId, somePlayerId, 6, 0, 2), it)
-      called = true
-    }
-    assertTrue(called)
-  }
-
-  @Test
+  @RepeatedTest(10)
   fun isWinningMove_true_onWinningResponseValue() {
     val somePlayerId = someString()
     val someOpponentId = someString()
 
-    assertTrue(Turn(somePlayerId, someOpponentId, 3,  0, 1).isWinningTurn())
-    assertTrue(Turn(somePlayerId, someOpponentId, 4, -1, 1).isWinningTurn())
-    assertTrue(Turn(somePlayerId, someOpponentId, 2,  1, 1).isWinningTurn())
+    val move = someInt(-1, 2)
+
+    val someMoveThatWinsNextTurn = Turn(somePlayerId, someOpponentId, 3 * (3 - move) - move, move, 3 - move)
+
+    var onNextTurnTriggered = false
+    someMoveThatWinsNextTurn.playNextTurn {
+      onNextTurnTriggered = true
+    }
+    assertFalse(onNextTurnTriggered)
   }
 
   @RepeatedTest(10)
@@ -98,12 +92,17 @@ class TurnTest {
 
   @RepeatedTest(30)
   fun init_justWithStartingNumber_determinesValuesCorrectly_withRandomInput() {
-    val somePlayerId = someString()
-    val someOpponentId = someString()
-
     val someMove = someInt(from = -1, to = 2)
-    val someInput = someInt(from = 1) * 3 - someMove
+    val someStartNumber = someInt(from = 1) * 3 - someMove
 
-    assertEquals(Turn(somePlayerId, someOpponentId, someInput, someMove, (someInput + someMove) / 3), Turn(somePlayerId, someOpponentId, someInput))
+    val somePlayer = Player(someString())
+    val someGame = Game(someStartNumber, someString())
+
+    var onValidTurnTriggered = false
+    Turn.playFirstTurn(somePlayer, someGame) {
+      onValidTurnTriggered = true
+      assertEquals(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3), it)
+    }
+    assertTrue(onValidTurnTriggered)
   }
 }

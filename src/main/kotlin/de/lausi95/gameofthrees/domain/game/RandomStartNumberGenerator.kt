@@ -11,5 +11,5 @@ import kotlin.random.Random
  */
 class RandomStartNumberGenerator(private val maxValue: Int = 10_000) : StartNumberGenerator {
 
-  override fun generateStartValue(): Int = Random.nextInt(1, maxValue)
+  override fun generateStartValue(): Int = Random.nextInt(2, maxValue)
 }
