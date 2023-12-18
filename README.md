@@ -5,8 +5,8 @@
 ## Important annotation
 In the task definition, it is stated that the possible
 moves of a player are [1, 0, 1]. This leads to impossible game states, since
-numbers with those moves cannot be transformed to a number that is divisible
-by 3.
+some numbers (like 10) cannot be transformed to a number which is divisible
+by 3, with those moves.
 
 I think there is a typo on the definition and it should state [-1, 0, 1].
 I assume this to be the case for this implementation.
