@@ -17,6 +17,7 @@ I assume this to be the case for this implementation.
 - Kafka
 - Domain-Driven Design
 - Onion Architecture
+- Property-Based Testing
 
 ## Build and Run
 To build and run the app(s) just go for docker-compose:
