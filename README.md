@@ -30,10 +30,24 @@ This ramps up `kafka` and 2 instances of the `game-of-threes` apps on different 
 
 ### Launching a game
 Depending where you hosted the players and on what port you started then,
-fire an `POST` request to the `host` and `port`:
+fire an `POST` request to `/games`. This lets this player offer a game that another
+player can pick up. The communication can be observed in the logs.
 
-```
-POST http(s)://[host]:[port]/games
+For example (if you use the `docker-compose.yml`) the players are launched at port `8080` and `8081`:
+
+```bash
+# build and start the services
+docker-compose build
+docker-compose up -d
+
+# Log player1 and player2 (recommendation, launch multiple terminals or sessions for each player)
+docker-compose logs -f player1 player2
+
+# Trigger a game with player1 as the initiator:
+http POST http://localhost:8080/games
+
+# Trigger a game from player2 as the initiator:
+http POST http://localhost:8081/games
 ```
 
 ### Playing the game
@@ -46,6 +60,11 @@ Depending on the configuration the turns are resolved automatically, or you can
 play for yourself.
 
 The game will go on until on player can reduce the number to 1.
+
+### Playing by yourself
+
+If you want to play by yourself, you need to attach to the process. So you eiter start
+the game on an IDE OR you run the docker image with the `-ti` flags, so attach to the terminal.
 
 ## Configuration
 

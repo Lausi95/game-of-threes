@@ -58,13 +58,12 @@ data class Turn(
         return
       }
 
-      log.info("I (${player.playerId}) Playing the Game against ${game.initiatorPlayerId} with starting number: ${game.startNumber}")
-
       val firstMove = moveResolver.resolveMove(game.startNumber)
-      val responseNumber = game.startNumber.resolveResponseNumber(firstMove)
+      val numberForOpponent = game.startNumber.resolveResponseNumber(firstMove)
 
-      val turn = Turn(player.playerId, game.initiatorPlayerId, game.startNumber, firstMove, responseNumber)
-      turnPlayedPublisher.publishTurnPlayed(turn)
+      log.info("I (${player.playerId}) Playing the Game against ${game.initiatorPlayerId} with starting number: ${game.startNumber}. First move: $firstMove. Number for opponent: $numberForOpponent")
+      val firstTurn = Turn(player.playerId, game.initiatorPlayerId, game.startNumber, firstMove, numberForOpponent)
+      turnPlayedPublisher.publishTurnPlayed(firstTurn)
     }
   }
 
@@ -90,24 +89,26 @@ data class Turn(
       return
     }
 
-    val move = moveResolver.resolveMove(responseNumber)
+    val currentNumber = responseNumber
+    val move = moveResolver.resolveMove(currentNumber)
+    val nextNumber = currentNumber.resolveResponseNumber(move)
 
-    val nextTurn = Turn(
+    val myTurn = Turn(
       opponentPlayerId,
       playerId,
-      responseNumber,
+      currentNumber,
       move,
-      responseNumber.resolveResponseNumber(move)
+      nextNumber
     )
 
-    if (nextTurn.isWinningTurn()) {
-      log.info("I WON!! Against player $opponentPlayerId on the move $move on the number $startingNumber")
+    if (myTurn.isWinningTurn()) {
+      log.info("I WON!! Against player $opponentPlayerId on the move $move on the number $currentNumber")
       return
     }
 
-    log.info("I ($playerId) playing the move $move against the player $opponentPlayerId on number $startingNumber. Number for opponent: $responseNumber")
+    log.info("I ($playerId) playing next move against the player $opponentPlayerId on number $responseNumber. Move: $move. Next number for opponent: $nextNumber")
 
-    turnPlayedPublisher.publishTurnPlayed(nextTurn)
+    turnPlayedPublisher.publishTurnPlayed(myTurn)
   }
 
   /**
