@@ -107,7 +107,7 @@ data class Turn(
   }
 
   fun formatMove(): String {
-    return "($startingNumber + ($move)) / 3 = $responseNumber)"
+    return "$startingNumber + ($move)) / 3 = $responseNumber"
   }
 
   /**
