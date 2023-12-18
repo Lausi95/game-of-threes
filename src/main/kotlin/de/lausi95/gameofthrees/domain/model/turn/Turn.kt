@@ -48,21 +48,21 @@ data class Turn(
     /**
      * Plays the first turn of a game.
      *
-     * @param player The player who is playing the turn.
+     * @param me The player who is playing the turn.
      * @param game The game in which the turn is being played.
      * @param moveResolver The move resolver for resolving the player's move.
      * @param turnPlayedPublisher The publisher for publishing the turn.
      */
-    fun playFirstTurn(player: Player, game: Game, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
-      if (player.playerId == game.initiatorPlayerId) {
+    fun playFirstTurn(me: Player, game: Game, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
+      if (me.playerId == game.initiatorPlayerId) {
         return
       }
 
       val firstMove = moveResolver.resolveMove(game.startNumber)
       val numberForOpponent = game.startNumber.resolveResponseNumber(firstMove)
 
-      log.info("I (${player.playerId}) Playing the Game against ${game.initiatorPlayerId} with starting number: ${game.startNumber}. First move: $firstMove. Number for opponent: $numberForOpponent")
-      val firstTurn = Turn(player.playerId, game.initiatorPlayerId, game.startNumber, firstMove, numberForOpponent)
+      val firstTurn = Turn(me.playerId, game.initiatorPlayerId, game.startNumber, firstMove, numberForOpponent)
+      log.info("I (${me.playerId}) Playing the Game against player '${game.initiatorPlayerId}' with starting number: ${game.startNumber}. First move: ${firstTurn.formatMove()}")
       turnPlayedPublisher.publishTurnPlayed(firstTurn)
     }
   }
@@ -82,19 +82,14 @@ data class Turn(
    * @param turnPlayedPublisher The publisher for publishing the turn.
    */
   fun playNextTurn(me: Player, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
-    if (opponentPlayerId == playerId) {
-      return
-    }
-    if (opponentPlayerId == me.playerId) {
-      return
-    }
+    if (me.playerId != opponentPlayerId || me.playerId == playerId) return
 
     val currentNumber = responseNumber
     val move = moveResolver.resolveMove(currentNumber)
     val nextNumber = currentNumber.resolveResponseNumber(move)
 
     val myTurn = Turn(
-      opponentPlayerId,
+      me.playerId,
       playerId,
       currentNumber,
       move,
@@ -102,13 +97,17 @@ data class Turn(
     )
 
     if (myTurn.isWinningTurn()) {
-      log.info("I WON!! Against player $opponentPlayerId on the move $move on the number $currentNumber")
+      log.info("I (${me.playerId}) WON!! Against player '$playerId' on the move: ${myTurn.formatMove()}")
       return
     }
 
-    log.info("I ($playerId) playing next move against the player $opponentPlayerId on number $responseNumber. Move: $move. Next number for opponent: $nextNumber")
+    log.info("I (${me.playerId}) playing next move against the player '$playerId' on number $currentNumber. Move: $move. Next number for opponent: ${myTurn.formatMove()}")
 
     turnPlayedPublisher.publishTurnPlayed(myTurn)
+  }
+
+  fun formatMove(): String {
+    return "($startingNumber + ($move)) / 3 = $responseNumber)"
   }
 
   /**
