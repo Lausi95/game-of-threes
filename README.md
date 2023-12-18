@@ -40,8 +40,10 @@ For example (if you use the `docker-compose.yml`) the players are launched at po
 docker-compose build
 docker-compose up -d
 
-# Log player1 and player2 (recommendation, launch multiple terminals or sessions for each player)
+# Log player1 and player2
 docker-compose logs -f player1 player2
+
+# Use a different terminal or other tools to launch HTTP-Requests
 
 # Trigger a game with player1 as the initiator:
 http POST http://localhost:8080/games
