@@ -16,7 +16,7 @@ private class TurnListener(
   @KafkaListener(topics = ["\${topics.turn-played}"])
   fun turnPlayed(message: String) {
     val turnDto = objectMapper.readValue(message, TurnDto::class.java)
-    val turn = Turn(turnDto.playerId, turnDto.opponentPlayerId, turnDto.startingNumber, turnDto.move, turnDto.responseNumber)
+    val turn = Turn(turnDto.playerId, turnDto.opponentPlayerId, turnDto.givenNumber, turnDto.move, turnDto.numberForOpponent)
     turnApplicationService.playNextTurn(turn)
   }
 }

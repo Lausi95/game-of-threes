@@ -16,7 +16,7 @@ private class GameStartedPublisherKafkaProducer(
 ): GameStartedPublisher {
 
   override fun publishGameStarted(game: Game) {
-    val gameDto = GameDto(game.startNumber, game.initiatorPlayerId)
+    val gameDto = GameDto(game.firstNumber, game.initiatorPlayerId)
     val message = objectMapper.writeValueAsString(gameDto)
     kafkaTemplate.send(gameStartedTopic, message)
   }

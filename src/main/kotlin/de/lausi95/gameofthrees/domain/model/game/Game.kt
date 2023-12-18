@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
  * Represents a game.
  */
 data class Game(
-  val startNumber: Int,
+  val firstNumber: Int,
   val initiatorPlayerId: String,
 ) {
 
@@ -18,19 +18,21 @@ data class Game(
     /**
      * Starts a new game.
      *
-     * @param player The player who initiates the game.
-     * @param startNumberGenerator The strategy for generating the start value of the game.
+     * @param me The player who initiates the game.
+     * @param firstNumberGenerator The strategy for generating the start value of the game.
      * @param gameStartedPublisher The function for publishing the game.
      * @return The initialized game instance if the game is properly setup, otherwise `null`.
      */
-    fun start(player: Player, startNumberGenerator: StartNumberGenerator, gameStartedPublisher: GameStartedPublisher): Game? {
-      val startValue = startNumberGenerator.generateStartValue()
+    fun start(me: Player, firstNumberGenerator: FirstNumberGenerator, gameStartedPublisher: GameStartedPublisher): Game? {
+      val startValue = firstNumberGenerator.generateFirstNumber()
       if (startValue <= 1) {
         log.warn("Won't start game with start value $startValue. It has to be > 1 to create a valid game setup.")
         return null
       }
 
-      val game = Game(startValue, player.playerId)
+      log.info("I (${me.playerId}) challenging players to play against me on number ${startValue}!")
+
+      val game = Game(startValue, me.playerId)
       gameStartedPublisher.publishGameStarted(game)
       return game
     }

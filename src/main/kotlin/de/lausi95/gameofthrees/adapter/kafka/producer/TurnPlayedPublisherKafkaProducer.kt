@@ -16,7 +16,7 @@ private class TurnPlayedPublisherKafkaProducer(
 ) : TurnPlayedPublisher {
 
   override fun publishTurnPlayed(turn: Turn) {
-    val turnDto = TurnDto(turn.playerId, turn.opponentPlayerId, turn.startingNumber, turn.move, turn.responseNumber)
+    val turnDto = TurnDto(turn.playerId, turn.opponentPlayerId, turn.givenNumber, turn.move, turn.numberForOpponent)
     val message = objectMapper.writeValueAsString(turnDto)
     kafkaTemplate.send(turnPlayedTopic, message)
   }

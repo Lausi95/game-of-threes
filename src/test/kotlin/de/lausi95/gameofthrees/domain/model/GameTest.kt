@@ -2,7 +2,7 @@ package de.lausi95.gameofthrees.domain.model
 
 import de.lausi95.gameofthrees.domain.model.game.Game
 import de.lausi95.gameofthrees.domain.model.game.GameStartedPublisher
-import de.lausi95.gameofthrees.domain.model.game.StartNumberGenerator
+import de.lausi95.gameofthrees.domain.model.game.FirstNumberGenerator
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
 import org.junit.jupiter.api.Assertions.*
@@ -15,8 +15,8 @@ class GameTest {
     val somePlayer = somePlayer()
     val someStartNumber = someInt(from = 2)
 
-    val startNumberGenerator = object : StartNumberGenerator {
-      override fun generateStartValue(): Int {
+    val firstNumberGenerator = object : FirstNumberGenerator {
+      override fun generateFirstNumber(): Int {
         return someStartNumber
       }
     }
@@ -26,12 +26,12 @@ class GameTest {
     val gameStartedPublisher = object : GameStartedPublisher {
       override fun publishGameStarted(game: Game) {
         publishGameFunctionTriggered = true
-        assertEquals(someStartNumber, game.startNumber)
+        assertEquals(someStartNumber, game.firstNumber)
         assertEquals(somePlayer.playerId, game.initiatorPlayerId)
       }
     }
 
-    Game.start(somePlayer, startNumberGenerator, gameStartedPublisher)
+    Game.start(somePlayer, firstNumberGenerator, gameStartedPublisher)
     assertTrue(publishGameFunctionTriggered)
   }
 
@@ -40,8 +40,8 @@ class GameTest {
     val somePlayer = somePlayer()
     val someInvalidStartNumber = someInt(from = -1000, to = 2)
 
-    val startNumberGenerator = object : StartNumberGenerator {
-      override fun generateStartValue(): Int {
+    val firstNumberGenerator = object : FirstNumberGenerator {
+      override fun generateFirstNumber(): Int {
         return someInvalidStartNumber
       }
     }
@@ -52,7 +52,7 @@ class GameTest {
         publishGameFunctionTriggered = true
       }
     }
-    Game.start(somePlayer, startNumberGenerator, gameStartedPublisher)
+    Game.start(somePlayer, firstNumberGenerator, gameStartedPublisher)
     assertFalse(publishGameFunctionTriggered)
   }
 }

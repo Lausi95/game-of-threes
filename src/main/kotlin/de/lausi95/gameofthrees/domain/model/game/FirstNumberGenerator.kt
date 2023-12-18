@@ -5,14 +5,14 @@ import kotlin.random.Random
 /**
  * Represents a strategy for generating the start value of a game.
  */
-interface StartNumberGenerator {
+interface FirstNumberGenerator {
 
   /**
    * Generates the start value for a game.
    *
    * @return The generated start value.
    */
-  fun generateStartValue(): Int
+  fun generateFirstNumber(): Int
 }
 
 /**
@@ -20,9 +20,9 @@ interface StartNumberGenerator {
  *
  * @param maxValue The maximum value for the random start value (default is 10,000).
  *
- * @see StartNumberGenerator
+ * @see FirstNumberGenerator
  */
-class RandomStartNumberGenerator(private val maxValue: Int = 10_000) : StartNumberGenerator {
+class RandomFirstNumberGenerator(private val maxValue: Int = 1_000_000) : FirstNumberGenerator {
 
-  override fun generateStartValue(): Int = Random.nextInt(2, maxValue)
+  override fun generateFirstNumber(): Int = Random.nextInt(2, maxValue)
 }

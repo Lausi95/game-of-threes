@@ -9,7 +9,7 @@ fun Int.isValid(): Boolean = VALID_MOVES.contains(this)
 fun Int.distanceToPrevNumberDivisibleBy(): Int = (this / DIVISOR) * DIVISOR - this
 fun Int.distanceToNextNumberDivisibleBy(): Int = (this / DIVISOR + 1) * DIVISOR - this
 
-fun Int.resolveResponseNumber(move: Int): Int = (this + move) / DIVISOR
+fun Int.resolveNextNumber(move: Int): Int = (this + move) / DIVISOR
 
 fun Int.resolveStartingNumber(move: Int): Int = this * DIVISOR - move
 
@@ -29,16 +29,16 @@ val VALID_MOVES = listOf(-1, 0, 1)
  *
  * @property playerId The ID of the player making the turn.
  * @property opponentPlayerId The ID of the opponent player.
- * @property startingNumber The starting number for the turn.
+ * @property givenNumber The starting number for the turn.
  * @property move The move made by the player.
- * @property responseNumber The number for the opponent player to play the next move on.
+ * @property numberForOpponent The number for the opponent player to play the next move on.
  */
 data class Turn(
   val playerId: String,
   val opponentPlayerId: String,
-  val startingNumber: Int,
+  val givenNumber: Int,
   val move: Int,
-  val responseNumber: Int
+  val numberForOpponent: Int
 ) {
 
   companion object {
@@ -58,11 +58,11 @@ data class Turn(
         return
       }
 
-      val firstMove = moveResolver.resolveMove(game.startNumber)
-      val numberForOpponent = game.startNumber.resolveResponseNumber(firstMove)
+      val firstMove = moveResolver.resolveMove(game.firstNumber)
+      val numberForOpponent = game.firstNumber.resolveNextNumber(firstMove)
 
-      val firstTurn = Turn(me.playerId, game.initiatorPlayerId, game.startNumber, firstMove, numberForOpponent)
-      log.info("I (${me.playerId}) Playing the Game against player '${game.initiatorPlayerId}' with starting number: ${game.startNumber}. First move: ${firstTurn.formatMove()}")
+      val firstTurn = Turn(me.playerId, game.initiatorPlayerId, game.firstNumber, firstMove, numberForOpponent)
+      log.info("I (${me.playerId}) Playing the Game against player '${game.initiatorPlayerId}' with starting number: ${game.firstNumber}. First move: ${firstTurn.formatMove()}")
       turnPlayedPublisher.publishTurnPlayed(firstTurn)
     }
   }
@@ -70,7 +70,7 @@ data class Turn(
   init {
     if (!move.isValid())
       throw IllegalArgumentException("Invalid move. Valid Moves: $VALID_MOVES")
-    if (responseNumber.resolveStartingNumber(move) != startingNumber)
+    if (numberForOpponent.resolveStartingNumber(move) != givenNumber)
       throw IllegalArgumentException("Impossible move")
   }
 
@@ -83,17 +83,18 @@ data class Turn(
    */
   fun playNextTurn(me: Player, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
     if (me.playerId != opponentPlayerId || me.playerId == playerId) return
+    val myOpponent = playerId
 
-    val currentNumber = responseNumber
-    val move = moveResolver.resolveMove(currentNumber)
-    val nextNumber = currentNumber.resolveResponseNumber(move)
+    val myGivenNumber = numberForOpponent
+    val myMove = moveResolver.resolveMove(myGivenNumber)
+    val myNumberForOpponent = myGivenNumber.resolveNextNumber(myMove)
 
     val myTurn = Turn(
       me.playerId,
-      playerId,
-      currentNumber,
-      move,
-      nextNumber
+      myOpponent,
+      myGivenNumber,
+      myMove,
+      myNumberForOpponent
     )
 
     if (myTurn.isWinningTurn()) {
@@ -101,13 +102,13 @@ data class Turn(
       return
     }
 
-    log.info("I (${me.playerId}) playing next move against the player '$playerId' on number $currentNumber. Move: $move. Next number for opponent: ${myTurn.formatMove()}")
+    log.info("I (${me.playerId}) playing next move against the player '$myOpponent' on number $myGivenNumber. Move: ${myTurn.formatMove()}")
 
     turnPlayedPublisher.publishTurnPlayed(myTurn)
   }
 
   fun formatMove(): String {
-    return "$startingNumber + ($move)) / 3 = $responseNumber"
+    return "($givenNumber + ($move)) / 3 = $numberForOpponent"
   }
 
   /**
@@ -115,5 +116,5 @@ data class Turn(
    *
    * @return true if the response number is 1, indicating a winning turn. Otherwise, false.
    */
-  fun isWinningTurn(): Boolean = responseNumber == 1
+  fun isWinningTurn(): Boolean = numberForOpponent == 1
 }

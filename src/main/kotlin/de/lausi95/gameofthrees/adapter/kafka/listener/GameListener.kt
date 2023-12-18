@@ -16,7 +16,7 @@ private class GameListener(
   @KafkaListener(topics = ["\${topics.game-started}"])
   fun startGameListener(message: String) {
     val gameDto = objectMapper.readValue(message, GameDto::class.java)
-    val game = Game(gameDto.startNumber, gameDto.initiatorPlayerId)
+    val game = Game(gameDto.firstNumber, gameDto.initiatorPlayerId)
     turnApplicationService.playFirstTurn(game)
   }
 }
