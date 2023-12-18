@@ -18,17 +18,18 @@ class TurnTest {
   fun nextTurn_returnValidNextTurn() {
     val me = somePlayer()
     val somePlayerId = someString()
-    val someOpponentId = someString()
 
-    val turn = Turn(somePlayerId, someOpponentId, 18, 0, 6)
+    val turn = Turn(somePlayerId, me.playerId, 18, 0, 6)
     var called = false
     val turnPlayedPublisher = object : TurnPlayedPublisher {
       override fun publishTurnPlayed(turn: Turn) {
-        assertEquals(Turn(someOpponentId, somePlayerId, 6, 0, 2), turn)
+        assertEquals(Turn(me.playerId, somePlayerId, 6, 0, 2), turn)
         called = true
       }
     }
+
     turn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
+
     assertTrue(called)
   }
 
