@@ -75,6 +75,15 @@ play for yourself.
 
 The game will go on until on player can reduce the number to 1.
 
+Example, if the player is hosted on port `8080`
+```bash
+# Getting the open moves
+HTTP GET http://localhost:8080/moves
+
+# Example move, if the move has id=123
+HTTP POST http://localhost:8080/moves/123?move=0
+```
+
 ### Using the `MANUAL` mode.
 
 If you want to play the game by yourself, you need to set the `MODE` of one player
