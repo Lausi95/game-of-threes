@@ -2,8 +2,8 @@ package de.lausi95.gameofthrees.domain.model
 
 import de.lausi95.gameofthrees.domain.model.game.Game
 import de.lausi95.gameofthrees.domain.model.player.Player
+import de.lausi95.gameofthrees.domain.model.turn.MoveStrategy
 import de.lausi95.gameofthrees.domain.model.turn.Turn
-import de.lausi95.gameofthrees.domain.model.turn.AUTOMATIC_MOVE_STRATEGY
 import de.lausi95.gameofthrees.domain.model.turn.TurnPlayedPublisher
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
@@ -11,11 +11,15 @@ import de.lausi95.gameofthrees.someString
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 import kotlin.test.assertFailsWith
+
+fun testMoveStrategy(move: Int) : MoveStrategy {
+  return object : MoveStrategy {
+    override fun name(): String = "TEST"
+    override fun resolveMove(number: Int, moveCallback: (Int) -> Unit) = moveCallback(move)
+  }
+}
 
 class TurnTest {
 
@@ -26,7 +30,7 @@ class TurnTest {
     val turn = Turn(someOpponent.playerId, me.playerId, 18, 0, 6)
     val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    turn.playNextTurn(me, AUTOMATIC_MOVE_STRATEGY, turnPlayedPublisher)
+    turn.playNextTurn(me, testMoveStrategy(0), turnPlayedPublisher)
 
     verify(turnPlayedPublisher).publishTurnPlayed(Turn(me.playerId, someOpponent.playerId, 6, 0, 2))
   }
@@ -40,7 +44,7 @@ class TurnTest {
     val someMoveThatWinsNextTurn = Turn(somePlayerId, someOpponentId, 3 * (3 - move) - move, move, 3 - move)
     val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    someMoveThatWinsNextTurn.playNextTurn(me, AUTOMATIC_MOVE_STRATEGY, turnPlayedPublisher)
+    someMoveThatWinsNextTurn.playNextTurn(me, testMoveStrategy(move), turnPlayedPublisher)
 
     verify(turnPlayedPublisher, times(0)).publishTurnPlayed(any())
   }
@@ -102,7 +106,7 @@ class TurnTest {
     val someGame = Game(someStartNumber, someString())
     val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    Turn.playFirstTurn(somePlayer, someGame, AUTOMATIC_MOVE_STRATEGY, turnPlayedPublisher)
+    Turn.playFirstTurn(somePlayer, someGame, testMoveStrategy(someMove), turnPlayedPublisher)
 
     verify(turnPlayedPublisher).publishTurnPlayed(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3))
   }
