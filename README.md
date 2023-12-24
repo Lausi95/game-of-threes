@@ -75,15 +75,6 @@ play for yourself.
 
 The game will go on until on player can reduce the number to 1.
 
-Example, if the player is hosted on port `8080`
-```bash
-# Getting the open moves
-HTTP GET http://localhost:8080/moves
-
-# Example move, if the move has id=123
-HTTP POST http://localhost:8080/moves/123?move=0
-```
-
 ### Using the `MANUAL` mode.
 
 If you want to play the game by yourself, you need to set the `MODE` of one player
@@ -93,6 +84,15 @@ You can see all moves, you can play, if you call the `GET /moves` endpoint.
 There you see a Map of moves with an ID and the Number that you need to play.
 
 Then you can play the move by calling the endpoint `POST /move/{moveId}?move=<YOUR-CHOICE>`
+
+Example, if the player is hosted on port `8080`
+```bash
+# Getting the open moves
+HTTP GET http://localhost:8080/moves
+
+# Example move, if the move has id=123
+HTTP POST http://localhost:8080/moves/123?move=0
+```
 
 ## Might also be interesting
 (☞ﾟヮﾟ)☞ Hire ☞(ﾟヮﾟ)☜ me ☜(ﾟヮﾟ☜)
