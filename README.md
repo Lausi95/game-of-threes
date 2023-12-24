@@ -85,7 +85,7 @@ There you see a Map of moves with an ID and the Number that you need to play.
 
 Then you can play the move by calling the endpoint `POST /move/{moveId}?move=<YOUR-CHOICE>`
 
-Example, if the player is hosted on port `8080`
+Example, if the `MANUAL` player is hosted on port `8080`
 ```bash
 # Getting the open moves
 HTTP GET http://localhost:8080/moves
