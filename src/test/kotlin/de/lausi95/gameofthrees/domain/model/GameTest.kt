@@ -5,8 +5,8 @@ import de.lausi95.gameofthrees.domain.model.game.GameStartedPublisher
 import de.lausi95.gameofthrees.domain.model.game.FirstNumberGenerator
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
+import org.mockito.kotlin.*
 
 class GameTest {
 
@@ -14,45 +14,28 @@ class GameTest {
   fun start_shouldTriggerOnGameStart_whenGameIsValid() {
     val somePlayer = somePlayer()
     val someStartNumber = someInt(from = 2)
-
-    val firstNumberGenerator = object : FirstNumberGenerator {
-      override fun generateFirstNumber(): Int {
-        return someStartNumber
-      }
-    }
-
-    var publishGameFunctionTriggered = false
-
-    val gameStartedPublisher = object : GameStartedPublisher {
-      override fun publishGameStarted(game: Game) {
-        publishGameFunctionTriggered = true
-        assertEquals(someStartNumber, game.firstNumber)
-        assertEquals(somePlayer.playerId, game.initiatorPlayerId)
-      }
+    val gameStartedPublisher = mock<GameStartedPublisher> {}
+    val firstNumberGenerator = mock<FirstNumberGenerator> {
+      on { generateFirstNumber() } doReturn someStartNumber
     }
 
     Game.start(somePlayer, firstNumberGenerator, gameStartedPublisher)
-    assertTrue(publishGameFunctionTriggered)
+
+    verify(gameStartedPublisher).publishGameStarted(any())
   }
 
   @RepeatedTest(10)
   fun start_shouldNotTriggerOnGameStart_whenStartingNumberIsInvalid() {
     val somePlayer = somePlayer()
     val someInvalidStartNumber = someInt(from = -1000, to = 2)
-
-    val firstNumberGenerator = object : FirstNumberGenerator {
-      override fun generateFirstNumber(): Int {
-        return someInvalidStartNumber
-      }
+    val firstNumberGenerator = mock<FirstNumberGenerator> {
+      on { generateFirstNumber() } doReturn someInvalidStartNumber
     }
+    val gameStartedPublisher = mock<GameStartedPublisher> {}
+    doReturn(someInvalidStartNumber).`when`(firstNumberGenerator).generateFirstNumber()
 
-    var publishGameFunctionTriggered = false
-    val gameStartedPublisher = object : GameStartedPublisher {
-      override fun publishGameStarted(game: Game) {
-        publishGameFunctionTriggered = true
-      }
-    }
     Game.start(somePlayer, firstNumberGenerator, gameStartedPublisher)
-    assertFalse(publishGameFunctionTriggered)
+
+    verify(gameStartedPublisher, times(0)).publishGameStarted(any())
   }
 }

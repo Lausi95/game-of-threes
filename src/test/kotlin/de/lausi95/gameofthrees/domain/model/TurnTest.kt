@@ -2,8 +2,8 @@ package de.lausi95.gameofthrees.domain.model
 
 import de.lausi95.gameofthrees.domain.model.game.Game
 import de.lausi95.gameofthrees.domain.model.player.Player
+import de.lausi95.gameofthrees.domain.model.turn.MoveStrategy
 import de.lausi95.gameofthrees.domain.model.turn.Turn
-import de.lausi95.gameofthrees.domain.model.turn.AUTOMATIC_MOVE_RESOLVER
 import de.lausi95.gameofthrees.domain.model.turn.TurnPlayedPublisher
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
@@ -11,6 +11,15 @@ import de.lausi95.gameofthrees.someString
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.*
+import kotlin.test.assertFailsWith
+
+fun testMoveStrategy(move: Int) : MoveStrategy {
+  return object : MoveStrategy {
+    override fun name(): String = "TEST"
+    override fun resolveMove(number: Int, moveCallback: (Int) -> Unit) = moveCallback(move)
+  }
+}
 
 class TurnTest {
 
@@ -18,19 +27,12 @@ class TurnTest {
   fun nextTurn_returnValidNextTurn() {
     val me = somePlayer()
     val someOpponent = somePlayer()
-
     val turn = Turn(someOpponent.playerId, me.playerId, 18, 0, 6)
-    var called = false
-    val turnPlayedPublisher = object : TurnPlayedPublisher {
-      override fun publishTurnPlayed(turn: Turn) {
-        assertEquals(Turn(me.playerId, someOpponent.playerId, 6, 0, 2), turn)
-        called = true
-      }
-    }
+    val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    turn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
+    turn.playNextTurn(me, testMoveStrategy(0), turnPlayedPublisher)
 
-    assertTrue(called)
+    verify(turnPlayedPublisher).publishTurnPlayed(Turn(me.playerId, someOpponent.playerId, 6, 0, 2))
   }
 
   @RepeatedTest(10)
@@ -38,19 +40,13 @@ class TurnTest {
     val me = somePlayer()
     val somePlayerId = someString()
     val someOpponentId = someString()
-
     val move = someInt(-1, 2)
-
     val someMoveThatWinsNextTurn = Turn(somePlayerId, someOpponentId, 3 * (3 - move) - move, move, 3 - move)
+    val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    var onNextTurnTriggered = false
-    val turnPlayedPublisher = object : TurnPlayedPublisher {
-      override fun publishTurnPlayed(turn: Turn) {
-        onNextTurnTriggered = true
-      }
-    }
-    someMoveThatWinsNextTurn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
-    assertFalse(onNextTurnTriggered)
+    someMoveThatWinsNextTurn.playNextTurn(me, testMoveStrategy(move), turnPlayedPublisher)
+
+    verify(turnPlayedPublisher, times(0)).publishTurnPlayed(any())
   }
 
   @RepeatedTest(10)
@@ -66,7 +62,7 @@ class TurnTest {
 
   @RepeatedTest(10)
   fun init_cannotCreateTurn_whenTurnIsInvalid() {
-    assertThrows(IllegalArgumentException::class.java) {
+    assertFailsWith<IllegalArgumentException> {
       val somePlayerId = someString()
       val someOpponentId = someString()
 
@@ -78,7 +74,7 @@ class TurnTest {
 
   @RepeatedTest(10)
   fun init_cannotCreateTurn_whenStartingNumberPlugMoveIsNotDivisibleByThree() {
-    assertThrows(IllegalArgumentException::class.java) {
+    assertFailsWith<IllegalArgumentException> {
       val somePlayerId = someString()
       val someOpponentId = someString()
 
@@ -106,18 +102,12 @@ class TurnTest {
   fun init_justWithStartingNumber_determinesValuesCorrectly_withRandomInput() {
     val someMove = someInt(from = -1, to = 2)
     val someStartNumber = someInt(from = 1) * 3 - someMove
-
     val somePlayer = Player(someString())
     val someGame = Game(someStartNumber, someString())
+    val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    var onValidTurnTriggered = false
-    val turnPlayedPublisher = object : TurnPlayedPublisher {
-      override fun publishTurnPlayed(turn: Turn) {
-        onValidTurnTriggered = true
-        assertEquals(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3), turn)
-      }
-    }
-    Turn.playFirstTurn(somePlayer, someGame, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
-    assertTrue(onValidTurnTriggered)
+    Turn.playFirstTurn(somePlayer, someGame, testMoveStrategy(someMove), turnPlayedPublisher)
+
+    verify(turnPlayedPublisher).publishTurnPlayed(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3))
   }
 }

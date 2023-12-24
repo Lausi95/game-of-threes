@@ -1,19 +1,15 @@
-FROM gradle:8.5-jdk17 as builder
+FROM gradle:jdk21 as builder
 
-WORKDIR /
-
+WORKDIR /src
 COPY . .
 RUN gradle build -x test
 
-FROM openjdk:17-alpine
+FROM openjdk:21-slim
 
 WORKDIR /application
 EXPOSE 8080
 
-RUN apk add curl
+COPY --from=builder /src/build/libs/application.jar ./application.jar
 
-COPY --from=builder /build/libs/application.jar ./application.jar
-
-HEALTHCHECK CMD curl --fail http://localhost:8080/actuator/health || exit 1
 ENTRYPOINT ["sh", "-c"]
 CMD ["java -jar application.jar"]

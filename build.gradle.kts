@@ -11,7 +11,7 @@ group = "de.lausi95"
 version = "0.0.1-SNAPSHOT"
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -27,12 +27,15 @@ dependencies {
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("com.tngtech.archunit:archunit:1.2.1")
+
+  testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.22")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
 }
 
 tasks.withType<KotlinCompile> {
   kotlinOptions {
     freeCompilerArgs += "-Xjsr305=strict"
-    jvmTarget = "17"
+    jvmTarget = "21"
   }
 }
 
