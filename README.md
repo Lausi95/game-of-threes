@@ -22,9 +22,21 @@ I assume this to be the case for this implementation.
 ## Build and Run
 To build and run the app(s) just go for docker-compose:
 ```bash
+docker-compose build
 docker-compose up -d
 ```
 This ramps up `kafka` and 2 instances of the `game-of-threes` apps on different ports.
+
+## Configuration
+
+The configuration of a player is done by environment variables.
+
+| Name        | Description                                                                                           | Choices               |
+|-------------|-------------------------------------------------------------------------------------------------------|-----------------------|
+| `KAFKA_URL` | Url to a kafka node.                                                                                  |                       |
+| `PLAYER_ID` | ID of the player, playing the game. For multiple players, the ID needs to be different for each node. |                       |
+| `MODE`      | Decides how the move for each turn of that player is determined.                                      | `AUTOMATIC`, `MANUAL` |
+
 
 ## How to play
 
@@ -63,22 +75,15 @@ play for yourself.
 
 The game will go on until on player can reduce the number to 1.
 
-### Playing by yourself
+### Using the `MANUAL` mode.
 
-If you want to play by yourself, you need to attach to the process. So you eiter start
-the game on an IDE OR you run the docker image with the `-ti` flags, so attach to the terminal.
+If you want to play the game by yourself, you need to set the `MODE` of one player
+to `MANUAL`.
 
-## Configuration
+You can see all moves, you can play, if you call the `GET /moves` endpoint.
+There you see a Map of moves with an ID and the Number that you need to play.
 
-The configuration of a player is done by environment variables.
-
-`KAFKA_URL`: **mandatory** Url to a kafka node.
-
-`PLAYER_ID`: **mandatory** ID of the player, playing the game. If multiple players should
-play the game, the `PLAYER_ID` should be different for each instance.
-
-`MOVE_RESOLVER`: **optional** Decides if the player plays manually or with user input.
-To play manual, set the variable to `MANUAL`. Default: `AUTOMATIC`
+Then you can play the move by calling the endpoint `POST /move/{moveId}?move=<YOUR-CHOICE>`
 
 ## Might also be interesting
 (☞ﾟヮﾟ)☞ Hire ☞(ﾟヮﾟ)☜ me ☜(ﾟヮﾟ☜)
