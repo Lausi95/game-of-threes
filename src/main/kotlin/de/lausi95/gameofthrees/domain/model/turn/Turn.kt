@@ -4,25 +4,11 @@ import de.lausi95.gameofthrees.domain.model.game.Game
 import de.lausi95.gameofthrees.domain.model.player.Player
 import org.slf4j.LoggerFactory
 
-fun Int.isValid(): Boolean = VALID_MOVES.contains(this)
-
-fun Int.distanceToPrevNumberDivisibleBy(): Int = (this / DIVISOR) * DIVISOR - this
-fun Int.distanceToNextNumberDivisibleBy(): Int = (this / DIVISOR + 1) * DIVISOR - this
-
-fun Int.resolveNextNumber(move: Int): Int = (this + move) / DIVISOR
-
-fun Int.resolveStartingNumber(move: Int): Int = this * DIVISOR - move
-
-internal fun Int.resolveNextMove(): Int {
-  return listOf(
-    this.distanceToNextNumberDivisibleBy(),
-    this.distanceToPrevNumberDivisibleBy()
-  ).filter { VALID_MOVES.contains(it) }.min()
-}
-
-const val DIVISOR = 3
-
 val VALID_MOVES = listOf(-1, 0, 1)
+
+fun Int.isValid(): Boolean = VALID_MOVES.contains(this)
+fun Int.resolveNextNumber(move: Int): Int = (this + move) / 3
+fun Int.resolveStartingNumber(move: Int): Int = this * 3 - move
 
 /**
  * Represents a turn in a game.
@@ -33,7 +19,7 @@ val VALID_MOVES = listOf(-1, 0, 1)
  * @property move The move made by the player.
  * @property numberForOpponent The number for the opponent player to play the next move on.
  */
-data class Turn(
+data class Turn (
   val playerId: String,
   val opponentPlayerId: String,
   val givenNumber: Int,
@@ -50,20 +36,21 @@ data class Turn(
      *
      * @param me The player who is playing the turn.
      * @param game The game in which the turn is being played.
-     * @param moveResolver The move resolver for resolving the player's move.
+     * @param moveStrategy The move resolver for resolving the player's move.
      * @param turnPlayedPublisher The publisher for publishing the turn.
      */
-    fun playFirstTurn(me: Player, game: Game, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
+    fun playFirstTurn(me: Player, game: Game, moveStrategy: MoveStrategy, turnPlayedPublisher: TurnPlayedPublisher) {
       if (me.playerId == game.initiatorPlayerId) {
         return
       }
 
-      val firstMove = moveResolver.resolveMove(game.firstNumber)
-      val numberForOpponent = game.firstNumber.resolveNextNumber(firstMove)
+      moveStrategy.resolveMove(game.firstNumber) {
+        val numberForOpponent = game.firstNumber.resolveNextNumber(it)
 
-      val firstTurn = Turn(me.playerId, game.initiatorPlayerId, game.firstNumber, firstMove, numberForOpponent)
-      log.info("I (${me.playerId}) Playing the Game against player '${game.initiatorPlayerId}' with starting number: ${game.firstNumber}. First move: ${firstTurn.formatMove()}")
-      turnPlayedPublisher.publishTurnPlayed(firstTurn)
+        val firstTurn = Turn(me.playerId, game.initiatorPlayerId, game.firstNumber, it, numberForOpponent)
+        log.info("I (${me.playerId}) Playing the Game against player '${game.initiatorPlayerId}' with starting number: ${game.firstNumber}. First move: ${firstTurn.formatMove()}")
+        turnPlayedPublisher.publishTurnPlayed(firstTurn)
+      }
     }
   }
 
@@ -78,33 +65,35 @@ data class Turn(
    * Plays the next turn in the game.
    *
    * @param me The current player.
-   * @param moveResolver The move resolver for resolving the player's move.
+   * @param moveStrategy The move resolver for resolving the player's move.
    * @param turnPlayedPublisher The publisher for publishing the turn.
    */
-  fun playNextTurn(me: Player, moveResolver: MoveResolver, turnPlayedPublisher: TurnPlayedPublisher) {
+  fun playNextTurn(me: Player, moveStrategy: MoveStrategy, turnPlayedPublisher: TurnPlayedPublisher) {
     if (me.playerId != opponentPlayerId || me.playerId == playerId) return
     val myOpponent = playerId
 
     val myGivenNumber = numberForOpponent
-    val myMove = moveResolver.resolveMove(myGivenNumber)
-    val myNumberForOpponent = myGivenNumber.resolveNextNumber(myMove)
+    moveStrategy.resolveMove(myGivenNumber) { myMove ->
+      val myNumberForOpponent = myGivenNumber.resolveNextNumber(myMove)
 
-    val myTurn = Turn(
-      me.playerId,
-      myOpponent,
-      myGivenNumber,
-      myMove,
-      myNumberForOpponent
-    )
+      val myTurn = Turn(
+        me.playerId,
+        myOpponent,
+        myGivenNumber,
+        myMove,
+        myNumberForOpponent
+      )
 
-    if (myTurn.isWinningTurn()) {
-      log.info("I (${me.playerId}) WON!! Against player '$playerId' on the move: ${myTurn.formatMove()}")
-      return
+      if (myTurn.isWinningTurn()) {
+        log.info("I (${me.playerId}) WON!! Against player '$playerId' on the move: ${myTurn.formatMove()}")
+        return@resolveMove
+      }
+
+      log.info("I (${me.playerId}) playing next move against the player '$myOpponent' on number $myGivenNumber. Move: ${myTurn.formatMove()}")
+
+      turnPlayedPublisher.publishTurnPlayed(myTurn)
     }
 
-    log.info("I (${me.playerId}) playing next move against the player '$myOpponent' on number $myGivenNumber. Move: ${myTurn.formatMove()}")
-
-    turnPlayedPublisher.publishTurnPlayed(myTurn)
   }
 
   fun formatMove(): String {

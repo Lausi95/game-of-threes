@@ -3,7 +3,7 @@ package de.lausi95.gameofthrees.domain.model
 import de.lausi95.gameofthrees.domain.model.game.Game
 import de.lausi95.gameofthrees.domain.model.player.Player
 import de.lausi95.gameofthrees.domain.model.turn.Turn
-import de.lausi95.gameofthrees.domain.model.turn.AUTOMATIC_MOVE_RESOLVER
+import de.lausi95.gameofthrees.domain.model.turn.AUTOMATIC_MOVE_STRATEGY
 import de.lausi95.gameofthrees.domain.model.turn.TurnPlayedPublisher
 import de.lausi95.gameofthrees.someInt
 import de.lausi95.gameofthrees.somePlayer
@@ -26,7 +26,7 @@ class TurnTest {
     val turn = Turn(someOpponent.playerId, me.playerId, 18, 0, 6)
     val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    turn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
+    turn.playNextTurn(me, AUTOMATIC_MOVE_STRATEGY, turnPlayedPublisher)
 
     verify(turnPlayedPublisher).publishTurnPlayed(Turn(me.playerId, someOpponent.playerId, 6, 0, 2))
   }
@@ -40,7 +40,7 @@ class TurnTest {
     val someMoveThatWinsNextTurn = Turn(somePlayerId, someOpponentId, 3 * (3 - move) - move, move, 3 - move)
     val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    someMoveThatWinsNextTurn.playNextTurn(me, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
+    someMoveThatWinsNextTurn.playNextTurn(me, AUTOMATIC_MOVE_STRATEGY, turnPlayedPublisher)
 
     verify(turnPlayedPublisher, times(0)).publishTurnPlayed(any())
   }
@@ -102,7 +102,7 @@ class TurnTest {
     val someGame = Game(someStartNumber, someString())
     val turnPlayedPublisher = mock<TurnPlayedPublisher> {}
 
-    Turn.playFirstTurn(somePlayer, someGame, AUTOMATIC_MOVE_RESOLVER, turnPlayedPublisher)
+    Turn.playFirstTurn(somePlayer, someGame, AUTOMATIC_MOVE_STRATEGY, turnPlayedPublisher)
 
     verify(turnPlayedPublisher).publishTurnPlayed(Turn(somePlayer.playerId, someGame.initiatorPlayerId, someStartNumber, someMove, (someStartNumber + someMove) / 3))
   }
